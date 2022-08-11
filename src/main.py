@@ -34,30 +34,25 @@ def sitemap():
 
 @app.route('/user', methods=['GET'])
 def handle_hello():
-
-    users= User.query.all
-    UserList = lit(map(lambda obj:obj.serialize(),users))
-    print(usersList)
-
-    response_body = {
-        "msg": "Hello, this is your GET /user response "
-    }
-
-    return jsonify(response_body), 200
+    user_query = User.query.all()
+    all_users = list(map(lambda obj: obj.serialize(), user_query))
+    return jsonify({
+        "result": all_users
+    }), 200
 
 
 
 @app.route('/users/<int:id_usuario>/favoritos', methods=['GET'])
 def los_favoritos(id_usuario):
 
-    response_personajes = User.query.filter_by(id=id_usuario).first().persFavoritos
-    response_planetas = User.query.filter_by(id=id_usuario).first().planFavoritos
-    Personajes = list(map(lambda obj: obj.serialize(), response_personajes))
-    Planetas = list(map(lambda obj: obj.serialize(), response_planetas))
+    response_personajes = User.query.filter_by(id=id_usuario).first()
+    # response_planetas = User.query.filter_by(id=id_usuario).first().planFavoritos
+    # Personajes = list(map(lambda obj: obj.serialize(), response_personajes))
+    # Planetas = list(map(lambda obj: obj.serialize(), response_planetas))
 
     return jsonify({
-        "persFavoritos": Personajes,
-        "planFavoritos": Planetas
+        "persFavoritos": response_personajes.serialize()
+        # "planFavoritos": Planetas
     }), 200
 
 
@@ -66,7 +61,7 @@ def create_pers_favorito(personajes_id):
     id_usuario = 1
     user = User.query.get(id_usuario)
     personaje = Personajes.query.get(personajes_id)
-    listaFavoritos = User.query.filter_by(id=id_usuario).first().persFavoritos
+    listaFavoritos = user.favoritosPersonajes
     listaFavoritos.append(personaje)
     db.session.commit()
 

@@ -18,28 +18,28 @@ class User(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
     is_active = db.Column(db.Boolean(300), unique=False, nullable=False)
-    favoritosPersonajes = db.relationship('Personajes',secondary = favoritosPersonajes,backref =db.backref('favoritesPersonajes',lazy = True))
-    favoritosPlanetas = db.relationship('Planetas',secondary = favoritosPlanetas,backref =db.backref('favoritesPlanetas',lazy = True))
+    favoritosPersonajes = db.relationship('Personajes',secondary = favoritosPersonajes,backref =db.backref('favoritesPersonajes',lazy = "dynamic"))
+    favoritosPlanetas = db.relationship('Planetas',secondary = favoritosPlanetas,backref =db.backref('favoritesPlanetas',lazy = "dynamic"))
 
 
-def __repr__(self):
+    def __repr__(self):
         return '<User %r>' % self.email
 
-def serialize(self):
+    def serialize(self):
         return {
             "id": self.id,
             "password": self.password,
             "email": self.email,
-            "FavoritosPersonajes": self.favoritosPersonajes,
-            "favoritosPlanetas": self.favoritosPlanetas,
+            "favoritosPersonajes": self.obtener_favoritos(),
+            "favoritosPlanetas": self.obtener_favoritosPlanet(),
             # do not serialize the password, its a security breach
         }
     
-def obtener_Favoritos(self):
-        return list(map(lambda obj: obj.serialize(), self.Favoritos))
+    def obtener_favoritos(self):
+        return list(map(lambda obj: obj.serialize(), self.favoritosPersonajes))
 
-def obtener_favoritosPlanet(self):
-        return list(map(lambda obj: obj.serialize(), self.favoritosPlanet))
+    def obtener_favoritosPlanet(self):
+        return list(map(lambda obj: obj.serialize(), self.favoritosPlanetas))
 
 class Planetas(db.Model):
     __tablename__ = 'planetas'
@@ -53,7 +53,7 @@ class Planetas(db.Model):
         return {
             "id": self.id,
             "forma": self.forma,
-            "características": self.caracteríticas,
+            "características": self.características,
     }
 
 
@@ -72,6 +72,4 @@ class Personajes(db.Model):
             "id": self.id,
             "nombre": self.nombre,
             "altura": self.altura,
-            "colorPelo": self.colorPelo,
-            "colorOjos": self.colorOjos,
     }
